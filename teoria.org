@@ -1,0 +1,136 @@
+#+title: Teoria
+
+* Clases java para comunicaciones en red
+
+TCP/IP es una familia de protocolos desarrollados para permitir la comunicación entre cualquier par de ordenadores. Tiene cuatro capas:
+
+    - _Capa de aplicación_: lvl de las aplicaciones disponibles para los usuarios.
+    - _Capa de transporte_: suministra a las aplicaciones servicios de comunicaciones extremo a extremo utilizando dos tipos de protocolos *TCP* y *UDP*.
+    - _Capa de red_: su propósito es seleccionar la mejor ruta para enviar paquetes por la red. El principal que funciona en esta capa es el IP.
+    - _Capa de enlace o de interfaz de red_: recibe los datagramas de la capa red y los transmite al hardware de la red.
+
+Cuando escribimos aplicaciones java que se comunican a través de la red, se está programando en la capa aplicación. Normalmente no hay que preocuparse por las capas de transporte TCP y UDP ya que usamos las clases del paquete java.net. Pero es bueno conocer las diferencias entre las capas TCP y UDP para saber cual usar en nuestros programas.
+
+    - _TCP_: Protocolo *basado en la conexión*. Garantiza que los datos enviados de un extremo llegan al otro extremo de manera íntegra y en el mismo orden que se enviaron. De lo contrario, se notifica un error.
+    - _UDP_: *No basado en la conexión*. Envía paquetes de datos independientes, que se conocen como datagramas, de una app a otra; el orden de entrega no es importante y no se garantiza la recepción de los paquetes enviados, pero es más rápido.
+
+** Paquete java.net
+
+Contiene clases e interfaces para la implementación de aplicaciones de red. Estas incluyen:
+
+    - _Clase URL_: representa un puntero a un recurso de la web.
+    - _Clase URL Connection_: admite operaciones más complejas en las URL.
+    - _Clases ServerSocket y Socket_: dan soportes al protocolo TCP.
+      - _ServerSocket_: usada por el *servidor* para crear un socket en el puerto en que se escucha las peticiones de conexión de los clientes.
+      - _Socket_:usada tanto por *cliente* como por *servidor* para comunicarse entre ellos leyendo y escribiendo usando streams.
+    - _Clases DatagramSocket, MulticastSocket y DatagramPacket_: dan soporte a las comunicaciones UDP.
+
+* Los Puertos
+
+Los protocolos UDP y TCP usan puertos para asignar datos entrantes a un proceso en particular que se ejecuta en un ordenador.
+
+Los datos transmitidos a través de Internet van acompañados de información de direccionamiento que identifica la máquina y el puerto para el que está destinada.
+
+Las máquinas se identifican por su dirección ip y los puertos se identifican mediante un número de 16bits que tanto TCP como UDP usan para entregar los datos a la app correcta.
+
+En las comunicaciones TCP una app servidor vincula un socket a un nº de puerto específico. Esto tiene el efecto de registrar el servidor en el sistema para recibir todos los datos destinados a ese puerto. Una app cliente puede entonces comunicarse con el servidor enviándole peticiones a través de ese puerto.
+
+En las comunicaciones UDP el paquete datagrama contiene el nº de puerto de su destino y UDP enruta el paquete a la aplicación adecuada.
+
+* La clase InetAddres
+
+Esta clase es la abstracción que representa una dirección Ip. Tiene dos subclases:
+
+    - _Inet4Address_: para direcciones IPv4.
+    - _Inet6Address_: para direcciones IPv6.
+
+** Métodos de la clase InetAddres
+
+| Métodos                   | Misión                                                                    |
+|---------------------------+---------------------------------------------------------------------------|
+| getLocalHost()            | Devuelve un InetAddres que representa la Ip de la máquina que la ejecuta. |
+|---------------------------+---------------------------------------------------------------------------|
+| getByName(String host)    | Devuelve un InetAddres que representa la ip de la máquina especificada    |
+|                           | como parámetro (host). Este parámetro puede ser el nombre de la máquina,  |
+|                           | un nombre de dominio o una Ip                                             |
+|---------------------------+---------------------------------------------------------------------------|
+| getAllByName(String host) | Igual que el de arriba pero devuelve un array de InetAddres. Útil para    |
+|                           | averiguar todas las ip de una máquina.                                    |
+|---------------------------+---------------------------------------------------------------------------|
+| getHostAddress()          | Devuelve un string con la ip de un InetAddres                             |
+|---------------------------+---------------------------------------------------------------------------|
+| getHostName()             | Devuelve un string con el nombre de un InetAddres                         |
+|---------------------------+---------------------------------------------------------------------------|
+| getCanonicalHostName()    | Obtiene el nombre canónigo completo (Dirección real del host)             |
+
+Los tres primeros métodos pueden lanzar la excepción UnknownHostException que nos indica que no se ha podido determinar la dirección ip del host.
+
+* La clase URL
+
+Representa un puntero a un recurso en la web, este puede ser un fichero, un directorio o una referencia a un objeto más complicado. En general una URL tiene el siguiente formato:
+
+/http://host[:puerto][/nombre del path del servidor][?argumentos]/
+
+    - _host_: es el nombre de la máquina donde reside el recurso.
+    - _puerto_: nº del puerto en el que el servidor escucha las peticiones. Si no se indicara se coje el de por defecto, que es el 80 para el http.
+    - _nombre del path del servidor_: es el directorio donde se encuentra el recurso en el sistema de ficheros del servidor. Si no se indica se usa el de por defecto.
+    - _argumentos_: parámetos que se envía al servidor.
+
+** Métodos de la clase URL
+
+| Métodos          | Misión                                                                          |
+|------------------+---------------------------------------------------------------------------------|
+| getAuthority()   | Obtiene la autoridad del objeto URL                                             |
+|------------------+---------------------------------------------------------------------------------|
+| getDefaultPort() | Devuelve el numero de puerto por defecto asociado al obnjeto                    |
+|------------------+---------------------------------------------------------------------------------|
+| getPort()        | Devuelve el numero de puerto de la URL, -1 si no se indica                      |
+|------------------+---------------------------------------------------------------------------------|
+| getHost()        | Devuelve el nombre de la máquina                                                |
+|------------------+---------------------------------------------------------------------------------|
+| getQuery()       | Devuelve los argumentos que se envían a la página                               |
+|------------------+---------------------------------------------------------------------------------|
+| getPath()        | Devuelve el path y el nombre del fichero de la URL                              |
+|------------------+---------------------------------------------------------------------------------|
+| getFile()        | Lo mismo que el de arriba y además concatena los argumentos si los hubiera      |
+|------------------+---------------------------------------------------------------------------------|
+| getProtocol()    | Devuelve el nombre del protocolo asociado a la URL                              |
+|------------------+---------------------------------------------------------------------------------|
+| getUserInfo()    | Devuelve parte de los datos del usuario o nulo si no existe                     |
+|------------------+---------------------------------------------------------------------------------|
+| openStream()     | Devuelve un ImputStream de que podremos leer el contenido del recurso de la URL |
+|------------------+---------------------------------------------------------------------------------|
+| openConnection() | Devuelve un URLConnection que nos permite abrir una conexión con el recurso y   |
+|                  | realizar operaciones de lectura y escritura sobre él                            |
+
+* La clase URLConnection
+
+Una vez tenemos un objeto de la Clase URL hacemos uso del método /openConnection()/ para obtener el objeto URLConnection y usarlo.
+
+** Métodos de la clase URLConnection
+
+| Métodos                | Misión                                                                     |
+|------------------------+----------------------------------------------------------------------------|
+| getInputStream()       | Devuelve un InputStream para leer datos de la conexión                     |
+|------------------------+----------------------------------------------------------------------------|
+| getOutputStream()      | Lo mismo pero para escribir                                                |
+|------------------------+----------------------------------------------------------------------------|
+| setDoInput(boolean b)  | Permite que el usuario reciba datos de la URL si es true                   |
+|------------------------+----------------------------------------------------------------------------|
+| setDoOutput(boolean b) | Permite que el usuario envie o no datos.                                   |
+|------------------------+----------------------------------------------------------------------------|
+| connect()              | Abre una conexión al recurso, si la conexón no se ha establecido ya        |
+|------------------------+----------------------------------------------------------------------------|
+| getContentLength()     | Devuelve el valor del campo de cabecera /length/ o -1 si no lo hay         |
+|------------------------+----------------------------------------------------------------------------|
+| getContentType()       | Devuelve el valor del campo de cabecera /type/ o null si no está definido  |
+|------------------------+----------------------------------------------------------------------------|
+| getDate()              | Devuelve el valor del campo de cabecera /date/ o 0 si no esta definido     |
+|------------------------+----------------------------------------------------------------------------|
+| getLastModified()      | Devuelve el valor del campo de cabecera /last-modified/                    |
+|------------------------+----------------------------------------------------------------------------|
+| getHeaderField(int n)  | Devuelve el valor del enésimo campo de cabecera o null si no está definido |
+|------------------------+----------------------------------------------------------------------------|
+| getHeaderFields()      | Devuelve un Map con los cmposd e cabecera                                  |
+|------------------------+----------------------------------------------------------------------------|
+| getURL()               | Devuelve la direción URL                                                   |
