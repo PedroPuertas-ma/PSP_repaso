@@ -134,3 +134,218 @@ Una vez tenemos un objeto de la Clase URL hacemos uso del método /openConnectio
 | getHeaderFields()      | Devuelve un Map con los cmposd e cabecera                                  |
 |------------------------+----------------------------------------------------------------------------|
 | getURL()               | Devuelve la direción URL                                                   |
+
+* ¿Qué son los sockets?
+
+La comunicación entre procesos consiste en la transmisión de un mensaje entre un conector de un proceso y un conector de otro proceso, a este conector es lo que denominamos socket.
+
+Los sockets son los responsables de que un proceso emita o reciba información con otro proceso, incluso estando en otra máquina.
+
+Un socket estyá definado por un par de ip (local y remota), un protocolo de transporte (TCP o UDP) y un par de números de puertos (local y remoto).
+
+Para que dos aplicaciones puedan comunicarse entre sí es necesario que se cumpla lo siguiente:
+
+    - Que un programa sea capaz de localizar al otro.
+    - Que ambas aplicaciones sean capaces de intercambiarse cualquier secuencia de octetos.
+
+Para los /procesos receptores/ de mensajes, su conector de tener asociado dos campos:
+
+    - La dirección IP del host, es decir del servidor, en el que la aplicación está ejecutandose.
+    - El puerto local a través del cual la aplicación se comunica y que identifica el proceso.
+
+** Rangos de puertos
+
+| Rango                            | Asignacion                                                        |
+|----------------------------------+-------------------------------------------------------------------|
+| Puertos del sistema (0-1023)     | Asignados a servicios y protocolos de lvl de aplicación           |
+|----------------------------------+-------------------------------------------------------------------|
+| Puertos registrados (1024-49151) | Reservados por empresas y organizaciones para sus ppios servicios |
+|----------------------------------+-------------------------------------------------------------------|
+| Puertos efímeros (49152-65535)   | Los que podemos usar en nuestros programas sin problemas          |
+
+** Funcionamiento general de los sockets
+
+Un puerto es un punto de destino que identifica hacia que aplicación o proceso deben dirigirse los datos. El programa servidor se ejecuta en una máquina específica y tiene un socket que está unido a un nº de puerto específico. El servidor queda a la "espera" escuchando las solicitudes de conexión de los clientes sobre ese puerto.
+
+El programa cliente conoce el nombre de la máquna en la que se ejecuta el servidor y el nº de puerto por el que escucha las peticiones. Para realizar una solicitud de conexión, el cliente realiza la petición a la máquina através del puerto.
+
+El cliente también debe identificarse ante el servidor por lo que durante la conexión se utilizará un puerto local asignado por el sistema.
+
+Si todo ha salido correctamente, el servidor acepta la conexión. Una vez aceptada, el servidor obtiene un nuevo socket sobre un puerto diferente. Esto se debe a que por un lado debe seguir atendiendo las peticiones de conexión mediante el socket original y por otro debe atender las necesidades del cliente que se conectó.
+
+En el lado cliente, si se acepta la conexión, se crea un socket y el cliente puede utilizarlo para comunicarse con el servidor. Este socket utiliza un nº de puerto diferente al usado para conectarse al servidor. El cliente y el servidor pueden ahora comunicarse escribiendo y leyendo por sus respectivos sockets.
+
+* Tipos de Socket
+
+Hay dos tipos de sockets en redes IP, los que usan el protocolo TCP y los que usan el protocolo UDP.
+
+** Sockets TCP
+
+Los procesos que se van a comunicar deben establecer antes una conexión mediante un stream. Una vez establecida la conexión, los procesos leen y escriben en el stream sin tener que preocuparse de las direcciones de internet ni de los nº de puerto. El establecimiento de la conexión implica:
+
+    - Una petición de conexión desde el proceso cliente al proceso servidor.
+    - Una aceptación de la conexión del proceso servidor al proceso cliente.
+
+En java hay dos clases para implementar este protocolo, la clase *Socket* para implementar el cliente y *ServerSocket* para implementar el servidor.
+
+*** Clase ServerSocket
+
+Usada para implementar el servidor en el protocolo TCP.
+
+**** Constructores de la clase ServerSocket
+
+| Constructor                                     | Misión                                               |
+|-------------------------------------------------+------------------------------------------------------|
+| ServerSocket()                                  | Crea un servidor sin puerto asociado                 |
+|-------------------------------------------------+------------------------------------------------------|
+| ServerSocket(int port)                          | Crea un servidor cenlazado al puerto especificado    |
+|-------------------------------------------------+------------------------------------------------------|
+| ServerSocket(int port, int max)                 | El max indica el numero maximo de peticiones en cola |
+|-------------------------------------------------+------------------------------------------------------|
+| ServerSocket(int port, int max, InetAddres dir) | La dir se asocia a la dirección IP                   |
+
+**** Métodos de la clase ServerSocket
+
+| Métodos        | Misión                                                                                                                                                                        |
+|----------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| accept()       | Escucha una solicitud de conexión de un cliente y la acepta cuando se recibe una petición. Devuelve un Socket a través del cual se establecerá la comunicación con el cliente |
+|----------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| close()        | Cierra el servidor                                                                                                                                                            |
+|----------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| getLocalPort() | Devuelve el puerto local al que está enlazado el server socket                                                                                                                |
+
+*** Clase Socker
+
+Usada para implementar el cliente.
+
+**** Constructores de la clase Socket
+
+| Constructor                                                      | Misión                                                                                                     |
+|------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------|
+| Socket()                                                         | Crea un socket sin puerto asociado                                                                         |
+|------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------|
+| Socket(InetAddres adr, int port)                                 | Crea un socket y lo conecta al puerto y dirección IP especificados                                         |
+|------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------|
+| Socket(InetAddres adr, int port, InetAddres locadr, int locport) | Permite además especificar la dirección IP local y el puerto local a los se asociará el socke              |
+|------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------|
+| Socket(String host, int port)                                    | Crea un socket y lo conecta al numero del puerto y al nombre del host especificado *Este es el que usamos* |
+
+**** Métodos de la clase Socket
+
+| Métodos           | Misión                                                                         |
+|-------------------+--------------------------------------------------------------------------------|
+| getInputStream()  | Devuelve el stream que permite leer bytes desde el socket.                     |
+|-------------------+--------------------------------------------------------------------------------|
+| getOutputStream() | Devuelve el stream que permite escribir bytes sobre el socket                  |
+|-------------------+--------------------------------------------------------------------------------|
+| close()           | Cierra el socket                                                               |
+|-------------------+--------------------------------------------------------------------------------|
+| getInetAddress()  | Devuelve la dirección IP a la que el socket esta conectado, null si no lo está |
+|-------------------+--------------------------------------------------------------------------------|
+| getLocalPort()    | devuelve el puerto local al que está enlazado el socket, -1 si ni lo está      |
+|-------------------+--------------------------------------------------------------------------------|
+| getPort()         | devuelve el puerto remoto al que está conectado, 0 si no lo está               |
+
+** Sockets UDP
+
+Este protocolo no es fiable ya que no se garantiza que la información llege de manera íntegra de un extremo al otro.
+
+Cualquier proceso que necesite enviar o escribir mensajes debe crear primero un conector asociado a una IP y a un puerto. El servidor enlazará su conector a un puerto de servidor conocido por los clientes. El cliente enlazará su conector a cualquier puerto local libre. Cuando un receptor recibe un mensaje, se obtiene además del mensaje, la dirección IP y el puerto del emisor, permitiendo al receptor enviar la respuesta correspondiente al emisor.
+
+Obtaremos por este protocolo cuando deseemos una entrega más rapida y no importe perder parte de la información que se envía.
+
+En java hay dos clases para implementar este protocolo, *DatagramSocket* y *DatagramPacket*.
+
+*** Clase DatagramPacket
+
+Esta clase proporciona constructores para crear instancias de los datagramas que se van a recibir y de los datagramas que van a ser enviados.
+
+**** Constructores de la Clase DatagramPacket
+
+| Constructor                                                                 | Misión                                                                                            |
+|-----------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------|
+| DatagramPacket(byte[] buf, int length)                                      | /Para datagramas recibidos/. Se especifica la cadena de bytes y la longitud de la misma           |
+|-----------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------|
+| DatagramPacket(byte[] buf, int offset, int length)                          | /Para datagramas recibidos/. Como la anterior pero especificando ademas el offset                 |
+|-----------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------|
+| DatagramPacket(byte[] buf, int length, InetAddres dir, int port)            | /Para datagramas enviados/. Como la primera pero indicando el puero y la ip a la que se va a enviar |
+|-----------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------|
+| DatagramPacket(byte[] buf, int offset, int length InetAddres dir, int port) | /Para datagramas enviados/. Como la anterior pero además indicando el offset.                      |
+
+**** Métodos de la Clase DatagramPacket
+
+| Métodos                    | Misión                                                   |
+|----------------------------+----------------------------------------------------------|
+| getAddress()               | Devuelve la IP del host al cual se le envía el datagrama |
+|----------------------------+----------------------------------------------------------|
+| getData()                  | Devuelve el mensaje contenido en el datagrama            |
+|----------------------------+----------------------------------------------------------|
+| getLength()                | Devuelve la longitud de los datos                        |
+|----------------------------+----------------------------------------------------------|
+| getPort()                  | Devuelve el puerto                                       |
+|----------------------------+----------------------------------------------------------|
+| setAddress(InetAddres dir) | Establece la IP del datagrama al que se enviará          |
+|----------------------------+----------------------------------------------------------|
+| setData(byte[] buff)       | Establece el búfer de datos para ese packete             |
+|----------------------------+----------------------------------------------------------|
+| setLength(int length)      | Establece la longitud del paquete                        |
+|----------------------------+----------------------------------------------------------|
+| setPort(int port)          | Establece el puerto del paquete                          |
+
+*** Clase DatagramSocket
+
+Da soporte a socket para el envío y la recepción de datagramas UDP.
+
+**** Constructores de DatagramSocket
+
+| Constructor                             | Misión                                                                                                 |
+|-----------------------------------------+--------------------------------------------------------------------------------------------------------|
+| DatagramSocket()                        | Construye un socket para datagrams, es el sistema el que elige el puerto de entre los que estan libres |
+|-----------------------------------------+--------------------------------------------------------------------------------------------------------|
+| DatagramSocket(int port)                | Como el anterior pero especificando un puerto                                                          |
+|-----------------------------------------+--------------------------------------------------------------------------------------------------------|
+| DatagraSocket(int port, InetAddres dir) | Especificas además la dirección IP                                                                     |
+
+**** Métodos de DatagraSocket
+
+| Métodos                           | Misión                                                               |
+|-----------------------------------+----------------------------------------------------------------------|
+| recive(DatagramPacket pq)         | Recibe un DatagramPacket y llena el paquete con los datos que recibe |
+|-----------------------------------+----------------------------------------------------------------------|
+| send(DatagramPacket pq)           | Envía un DatagramPacket. El pq contiene el mensaje y su destino      |
+|-----------------------------------+----------------------------------------------------------------------|
+| close()                           | Cierra el socket                                                     |
+|-----------------------------------+----------------------------------------------------------------------|
+| getLocalPort()                    | Obtiene el puerto local, -1 si está cerrado y 0 si no está enlazado  |
+|-----------------------------------+----------------------------------------------------------------------|
+| getPort()                         | Obtiene el puerto al que está conectado, -1 si no lo está            |
+|-----------------------------------+----------------------------------------------------------------------|
+| connect(InetAddres add, int port) | Conecta el socket a un puerto remoto y una ip concretas              |
+|-----------------------------------+----------------------------------------------------------------------|
+| setSoTimeout(int timeout)         | Permite establecer un tiempo de espera límite                        |
+
+** MulticastSocket
+
+Es útil para enviar paquetes a múltiples destinos simultáneamente. Para poder recibir estos paquetes es necesario establecer un grupo multicast. Este grupo multicast no es más que un grupo de direcciones IP que comparten el mismo numero de puerto. Cuando se envía un mensaje a un grupo multicast, todos los que estén en ese grupo recibirán el mensjae; la pertenencia al grupo es transparente al emisor, es decir, el emisor no conoce el número de miembros del grupo ni sus IP.
+
+Un grupo multicast se especifica mediante una IP de calse D, que van desde 224.0.0.0 a 239.255.255.255 estando la 224.0.0.0 reservada, y un nº de puerto UDP estandar.
+
+*** Constructores de la clase MulticastSocket
+
+| Constructor               | Misión                                                 |
+|---------------------------+--------------------------------------------------------|
+| MulticastSocket()         | Construye un socket y elije el sistema un puerto libre |
+|---------------------------+--------------------------------------------------------|
+| MulticastSocket(int port) | Especificas el puerto                                  |
+
+*** Métodos de la clase MulticastSocket
+
+| Método                           | Misión                                                      |
+|----------------------------------+-------------------------------------------------------------|
+| joinGroup(InetAddres mcastaddr)  | Permite al socket multicast unirse al grupo de multicast    |
+|----------------------------------+-------------------------------------------------------------|
+| leaveGroup(InetAddres mcastaddr) | El socket multicast abandona el grupo multicast             |
+|----------------------------------+-------------------------------------------------------------|
+| send(DatagramPacket p)           | Envía el datagrama a todos los miembros del grupo multicast |
+|----------------------------------+-------------------------------------------------------------|
+| recive(DatagramPacket p)         | Recibe el datagrama del grupo multicast                     |
