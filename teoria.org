@@ -349,3 +349,87 @@ Un grupo multicast se especifica mediante una IP de calse D, que van desde 224.0
 | send(DatagramPacket p)           | Envía el datagrama a todos los miembros del grupo multicast |
 |----------------------------------+-------------------------------------------------------------|
 | recive(DatagramPacket p)         | Recibe el datagrama del grupo multicast                     |
+
+* Envío de objetos a través de Sockets
+
+** Objetos en protocolo TCP
+
+Las clases *ObjectInputStream* y *ObjectOutputSream* nos permiten enviar objetos usando Sockets y el protocolo TCP.
+
+Usaremos los métodos *readObject()* y *writeObject()* para leer y escribir respectivamente objetos, así como los constructores que admiten *InputStream* y *OutputSream*.
+
+Importante recordar que para poder escribir y leer objetos, los susodichos objetos deben implementar la interfaz serializable o si no de otro modo no funcionará.
+
+*** Ejemplo de escritura de objeto al flujo de salida
+
+#+begin_src java
+//Creamos un objeto de la clase Lista
+Lista lista1 = new Lista(new int [] {12, 15, 11, 4, 32});
+
+//Creamos un flujo de salida a disco, pasandole el nombre del archivo en disco o un objeto de la clase file.
+FileOutputStream ficheroSalida = new FileOutputStream("media.obj");
+
+//El flujo de salida ObjectOutputSream es el que procesa los datos y se ha de vincuilar a un objeto ficheroSalida de la clase FileOutputStream.
+ObjectOutputSream salida = new ObjectOutputSream(ficheroSalida);
+
+//El método writeObject escribe los objetos al flujo de salida y los guarda en un archivo en disco.
+salida.writeObject(lista1);
+
+//Cerramos los flujos.
+salida.close();
+#+end_src
+
+*** Ejemplo de lectura de objeto del flujo de entrada
+
+#+begin_src java
+//Creamos un flujo de entrada a disco, pasándole el nombre del archivo en disco o un objeto de la clase File.
+FileInputStream ficheroEntrada = new FileInputStream("media.obj");
+
+//El flujo entrada ObjectInputStream es el que procesa los datos y se ha de vincular a un objeto ficheroEntrada de la clase FileInputStream.
+ObjectInputStream entrada = new ObjectInputStream(ficheroEntrada);
+
+//El método readObject lee los objetos del flujo de entrada, en el mismo orden en el que ha sido escrito.
+
+Lista obj1 = (Lista) entrada.readObject();
+
+//Cerramos los flujos.
+entrada.close();
+#+end_src
+
+** Objetos en protocolo UDP
+
+Para intercambiar objetos en socket UDP utilizaremos la clase *ByteArrayOutputStream* y *ByteArrayInputStream*. Para esto, es necesario convertir el objeto en un array de bytes.
+
+*** Ejemplo de conversión de objeto a array
+
+#+begin_src java
+Persona persona = new Persona("Juan", 58);
+
+//Convertimos objetos a bytes
+ByteArrayOutputStream bs = new ByteArrayOutputStream();
+ObjectOutputSream out = new ObjectOutputSream(bs);
+
+//Escribimos el objeto persona en el stream
+out.writeObject(persona);
+
+//Cerramos el stream
+out.close();
+#+end_src
+
+*** Ejemplo de conversión de array a objeto
+
+#+begin_src java
+byte[] recibidos = new byte[1024];
+DatagramPacket paqRecibido = new DatagramPacket(recibidos, recibidos.length);
+
+//Recibo el datagrama
+socket.recive(paqRecibido);
+
+//Convertimos bytes a objeto
+ByteArrayInputStream bais = new ByteArrayInputStream(recibidos);
+ObjectInputStream in = new ObjectInputStream(bais);
+
+//Obtenemos el objeto y cerramos el stream
+Persona persona = (Persona) in.readObject();
+in.close();
+#+end_src
