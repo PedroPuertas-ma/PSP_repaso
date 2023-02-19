@@ -1,5 +1,44 @@
 #+title: Teoria
 
+* Indice
++ [[Clases java para comunicaciones en red]]
+  + [[Paquete java.net]]
++ [[Los Puertos]]
++ [[La clase InetAddres]]
+  + [[Métodos de la clase InetAddres]]
++ [[La clase URL]]
+  + [[Métodos de la clase URL]]
++ [[La clase URLConnection]]
+  + [[Métodos de la clase URLConnection]]
++ [[¿Qué son los sockets?]]
+  + [[Rangos de puertos]]
+  + [[Funcionamiento general de los sockets]]
++ [[Tipos de Socket]]
+  + [[Sockets TCP]]
+    + [[Clase ServerSocket]]
+      + [[Constructores de la clase ServerSocket]]
+      + [[Métodos de la clase ServerSocket]]
+    + [[Clase Socket]]
+      + [[Constructores de la clase Socket]]
+      + [[Métodos de la clase Socket]]
+  + [[Sockets UDP]]
+    + [[Clase DatagramPacket]]
+      + [[Constructores de la clase DatagramPacket]]
+      + [[Métodos de la clase DatagramPacket]]
+    + [[Clase DatagramSocket]]
+      + [[Constructores de DatagramSocket]]
+      + [[Métodos de DatagramSocket]]
+  + [[MulticastSocket]]
+    + [[Constructores de la clase MulticastSocket]]
+    + [[Métodos de la clase MulticastSocket]]
++ [[Envío de objetos a través de Sockets]]
+  + [[Objetos en protocolo TCP]]
+    + [[Ejemplo de escritura de objeto al flujo de salida]]
+    + [[Ejemplo de lectura de objeto del flujo de entrada]]
+  + [[Objetos en protocolo UDP]]
+    + [[Ejemplo de conversión de objeto a array]]
+    + [[Ejemplo de conversión de array a objeto]]
+
 * Clases java para comunicaciones en red
 
 TCP/IP es una familia de protocolos desarrollados para permitir la comunicación entre cualquier par de ordenadores. Tiene cuatro capas:
@@ -214,7 +253,7 @@ Usada para implementar el servidor en el protocolo TCP.
 |----------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | getLocalPort() | Devuelve el puerto local al que está enlazado el server socket                                                                                                                |
 
-*** Clase Socker
+*** Clase Socket
 
 Usada para implementar el cliente.
 
@@ -260,7 +299,7 @@ En java hay dos clases para implementar este protocolo, *DatagramSocket* y *Data
 
 Esta clase proporciona constructores para crear instancias de los datagramas que se van a recibir y de los datagramas que van a ser enviados.
 
-**** Constructores de la Clase DatagramPacket
+**** Constructores de la clase DatagramPacket
 
 | Constructor                                                                 | Misión                                                                                            |
 |-----------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------|
@@ -272,7 +311,7 @@ Esta clase proporciona constructores para crear instancias de los datagramas que
 |-----------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------|
 | DatagramPacket(byte[] buf, int offset, int length InetAddres dir, int port) | /Para datagramas enviados/. Como la anterior pero además indicando el offset.                      |
 
-**** Métodos de la Clase DatagramPacket
+**** Métodos de la clase DatagramPacket
 
 | Métodos                    | Misión                                                   |
 |----------------------------+----------------------------------------------------------|
@@ -306,7 +345,7 @@ Da soporte a socket para el envío y la recepción de datagramas UDP.
 |-----------------------------------------+--------------------------------------------------------------------------------------------------------|
 | DatagraSocket(int port, InetAddres dir) | Especificas además la dirección IP                                                                     |
 
-**** Métodos de DatagraSocket
+**** Métodos de DatagramSocket
 
 | Métodos                           | Misión                                                               |
 |-----------------------------------+----------------------------------------------------------------------|
